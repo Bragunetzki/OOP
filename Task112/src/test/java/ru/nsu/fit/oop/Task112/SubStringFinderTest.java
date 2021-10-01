@@ -10,8 +10,8 @@ class SubStringFinderTest {
 
     @Test
     public void testFinderBasic() {
-        int[] trueResult = {7};
-        List<Integer> list = SubStringFinder.findSubString("input.txt", "пирог");
+        int[] trueResult = {0, 2, 4};
+        List<Integer> list = SubStringFinder.findSubString("input.txt", "aba");
 
         int[] result = list.stream().mapToInt(i->i).toArray();
 

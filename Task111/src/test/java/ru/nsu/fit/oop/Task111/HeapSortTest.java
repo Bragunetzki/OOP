@@ -1,65 +1,47 @@
 package ru.nsu.fit.oop.Task111;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HeapSortTest {
+    static ArrayList<int[]> testArrays() {
+        var list = new ArrayList<int[]>();
 
-    @Test
-    public void testHeapSortBasic() {
-        int[] arr = {5, 4, 3, 2, 1};
-        int[] res = {1, 2, 3, 4, 5};
+        list.add(new int[] {0, 0, 0, 0, 0});
+        list.add(new int[] {5, 4, 3, 2, 1});
+        list.add(new int[] {1});
+        list.add(new int[] {2, 1});
+        list.add(new int[] {-4, 8, -3, 6, -2, 4, -1, 2});
+        list.add(new int[] {1, 2, 7, 3, 4, 2, 9});
+        list.add(new int[] {Integer.MAX_VALUE, Integer.MIN_VALUE});
+        list.add(new int[] {});
+
+        return list;
+    }
+
+    @ParameterizedTest
+    @MethodSource("testArrays")
+    public void testHeapSortBasic(int[] arr) {
+        int[] res = arr.clone();
+        Arrays.sort(res);
         HeapSort.sort(arr);
         assertArrayEquals(res, arr);
     }
 
-    @Test
-    public void testHeapSortSameElem() {
-        int[] arr = {1, 1, 1, 1, 1};
-        int[] res = {1, 1, 1, 1, 1};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
-    }
-
-    @Test
-    public void testHeapSortSorted() {
-        int[] arr = {1, 2};
-        int[] res = {1, 2};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
-    }
-
-    @Test
-    public void testHeapSortTwoElem() {
-        int[] arr = {2, 1};
-        int[] res = {1, 2};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
-    }
-
-    @Test
-    public void testHeapSortOneElem() {
-        int[] arr = {4};
-        int[] res = {4};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
-    }
-
-    @Test
-    public void testHeapSortRepeatingElems() {
-        int[] arr = {2, 2, 1, 1};
-        int[] res = {1, 1, 2, 2};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
-    }
-
-    @Test
-    public void testHeapSortAdvanced() {
-        int[] arr = {9, 1, 8, 2, 7, 3, 6, 4, 5};
-        int[] res = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        HeapSort.sort(arr);
-        assertArrayEquals(res, arr);
+    @ParameterizedTest
+    @NullSource
+    void testNull(int[] input) {
+        assertThrows(IllegalArgumentException.class, ()->HeapSort.sort(input));
     }
 
 }

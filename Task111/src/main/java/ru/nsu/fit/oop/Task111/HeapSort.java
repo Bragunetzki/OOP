@@ -10,7 +10,7 @@ public class HeapSort {
      * @param a - index of first element
      * @param b - index of second element
      */
-    static void swap(int[] arr, int a, int b) {
+    private static void swap(int[] arr, int a, int b) {
         int t = arr[a];
         arr[a] = arr[b];
         arr[b] = t;
@@ -22,7 +22,7 @@ public class HeapSort {
      * @param n - last element number.
      * @param start - first element number.
      */
-    static void heapify(int[] arr, int n, int start) {
+    private static void heapify(int[] arr, int n, int start) {
         int max = start;
         int l = 2*start+1;
         int r = 2*start+2;
@@ -45,6 +45,11 @@ public class HeapSort {
      * @param arr - input array.
      */
     public static void sort(int[] arr) {
+
+        if (arr == null) {
+            throw new IllegalArgumentException("Null argument exception!");
+        }
+
         int n = arr.length;
 
         //build initial heap

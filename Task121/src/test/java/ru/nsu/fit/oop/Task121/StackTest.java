@@ -9,26 +9,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class StackTest {
     @Test
     public void testStack1() {
-        int[] res = {2, 0};
-        Stack testedStack = new Stack(1);
+        Integer[] res = {2, null};
+        Stack<Integer> testedStack = new Stack<Integer>(1);
         testedStack.push(2);
         assertArrayEquals(res, testedStack.getStackArr());
 
         testedStack.push(7);
-        res = new int[] {2, 7, 0, 0};
+        res = new Integer[] {2, 7, null, null};
         assertArrayEquals(res, testedStack.getStackArr());
 
-        int[] pushedArr = {4, 8};
+        Integer[] pushedArr = {4, 8};
         testedStack.pushStack(pushedArr);
-        res = new int[] {2, 7, 4, 8, 0, 0, 0, 0};
+        res = new Integer[] {2, 7, 4, 8, null, null, null, null};
         assertArrayEquals(res, testedStack.getStackArr());
 
         testedStack.pop();
-        res = new int[] {2, 7, 4, 0, 0, 0, 0, 0};
+        res = new Integer[] {2, 7, 4, null, null, null, null, null};
         assertArrayEquals(res, testedStack.getStackArr());
 
         testedStack.popStack(2);
-        res = new int[] {2, 0, 0, 0, 0, 0, 0, 0};
+        res = new Integer[] {2, null, null, null, null, null, null, null};
         assertArrayEquals(res, testedStack.getStackArr());
 
         assertEquals(1,testedStack.count());

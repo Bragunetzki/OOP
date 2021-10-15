@@ -1,17 +1,21 @@
 package ru.nsu.fit.oop.Task121;
 
 import java.util.Arrays;
+import java.util.EmptyStackException;
 
 /**
  * Represents an array that functions like a stack data structure.
+ *
+ * @param <E> - type of element that will be stored within stack.
  */
-public class Stack {
-    private int[] stackArr;
+public class Stack<E> {
+    private Object[] stackArr;
     private int stackSize;
     private int stackCap;
 
     /**
      * Initializes an empty stack.
+     *
      * @param size - initial length of stack.
      */
     public Stack(int size) {
@@ -21,21 +25,22 @@ public class Stack {
 
         this.stackSize = 0;
         this.stackCap = size;
-        this.stackArr = new int[stackSize];
+        this.stackArr = new Object[stackSize];
     }
 
     /**
      * Initializes a stack by taking an existing array as a base.
+     *
      * @param arr - This array is copied into the stack.
      */
-    public Stack(int[] arr) {
+    public Stack(E[] arr) {
         if (arr.length < 1) {
             throw new IllegalArgumentException("Array size must be at least 1!");
         }
 
         this.stackSize = arr.length;
         this.stackCap = arr.length;
-        this.stackArr = new int[arr.length];
+        this.stackArr = new Object[arr.length];
 
         System.arraycopy(arr, 0, this.stackArr, 0, arr.length);
     }
@@ -45,44 +50,45 @@ public class Stack {
      */
     private void resize() {
         if (stackCap <= stackSize) {
-            stackArr = Arrays.copyOf(stackArr, stackCap*2);
-            stackCap*=2;
+            stackArr = Arrays.copyOf(stackArr, stackCap * 2);
+            stackCap *= 2;
         }
     }
 
     /**
-     * @return returns the array which is used for the stack data.
-     */
-    public int[] getStackArr() {
-        return stackArr;
-    }
-
-    /**
      * Pushes an element to the end of the stack.
+     *
      * @param elem - the element that needs to be pushed.
      */
-    public void push(int elem) {
+    public void push(E elem) {
+        if (elem == null) throw new IllegalArgumentException("Cannot push null element to stack!");
+
         stackSize++;
         resize();
-        stackArr[stackSize-1]=elem;
+        stackArr[stackSize - 1] = elem;
     }
 
     /**
      * Removes the last element of the stack.
+     *
      * @return returns the value of the removed element.
      */
-    public int pop() {
-        int poppedElem = stackArr[stackSize-1];
-        stackArr[stackSize-1]=0;
+    public E pop() {
+        if (stackSize == 0) throw new EmptyStackException();
+
+        E poppedElem = (E) stackArr[stackSize - 1];
+        stackArr[stackSize - 1] = null;
         stackSize--;
         return poppedElem;
     }
 
     /**
      * Pushes an array to the stack.
+     *
      * @param pushedArr - array containing variables that need to be pushed.
      */
-    public void pushStack(int[] pushedArr) {
+    public void pushStack(E[] pushedArr) {
+
         for (int i = 0; i < pushedArr.length; i++) {
             push(pushedArr[i]);
         }
@@ -90,12 +96,17 @@ public class Stack {
 
     /**
      * Removes multiple elements from the top of the stack.
+     *
      * @param elemNum - number of elements that need to be removed.
      */
     public void popStack(int elemNum) {
         for (int i = 0; i < elemNum; i++) {
             pop();
         }
+    }
+
+    public E[] getStackArr() {
+        return (E[]) stackArr;
     }
 
     /**

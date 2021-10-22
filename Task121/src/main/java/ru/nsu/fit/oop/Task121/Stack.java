@@ -11,21 +11,19 @@ import java.util.EmptyStackException;
 public class Stack<E> {
     private Object[] stackArr;
     private int stackSize;
-    private int stackCap;
 
     /**
      * Initializes an empty stack.
      *
-     * @param size - initial length of stack.
+     * @param capacity - initial length of stack.
      */
-    public Stack(int size) {
-        if (size < 1) {
+    public Stack(int capacity) {
+        if (capacity < 1) {
             throw new IllegalArgumentException("Stack size must be at least 1!");
         }
 
         this.stackSize = 0;
-        this.stackCap = size;
-        this.stackArr = new Object[stackSize];
+        this.stackArr = new Object[capacity];
     }
 
     /**
@@ -34,13 +32,16 @@ public class Stack<E> {
      * @param arr - This array is copied into the stack.
      */
     public Stack(E[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array can't be null!");
+        }
+
         if (arr.length < 1) {
             throw new IllegalArgumentException("Array size must be at least 1!");
         }
 
         this.stackSize = arr.length;
-        this.stackCap = arr.length;
-        this.stackArr = new Object[arr.length];
+        this.stackArr = new Object[arr.length+5];
 
         System.arraycopy(arr, 0, this.stackArr, 0, arr.length);
     }
@@ -49,9 +50,8 @@ public class Stack<E> {
      * Checks if stack is full and resizes it if more space is needed.
      */
     private void resize() {
-        if (stackCap <= stackSize) {
-            stackArr = Arrays.copyOf(stackArr, stackCap * 2);
-            stackCap *= 2;
+        if (stackArr.length <= stackSize) {
+            stackArr = Arrays.copyOf(stackArr, stackArr.length * 2);
         }
     }
 
@@ -85,12 +85,12 @@ public class Stack<E> {
     /**
      * Pushes an array to the stack.
      *
-     * @param pushedArr - array containing variables that need to be pushed.
+     * @param pushedStack - stack that needs to be pushed.
      */
-    public void pushStack(E[] pushedArr) {
-
-        for (int i = 0; i < pushedArr.length; i++) {
-            push(pushedArr[i]);
+    public void pushStack(Stack<E> pushedStack) {
+        int count = pushedStack.count();
+        for (int i = 0; i < count; i++) {
+            push(pushedStack.pop());
         }
     }
 
@@ -98,15 +98,16 @@ public class Stack<E> {
      * Removes multiple elements from the top of the stack.
      *
      * @param elemNum - number of elements that need to be removed.
+     *
+     * @return - returns the Stack that was popped.
      */
-    public void popStack(int elemNum) {
+    public Stack<E> popStack(int elemNum) {
+        Stack<E> returnStack = new Stack<E>(elemNum);
         for (int i = 0; i < elemNum; i++) {
-            pop();
+            returnStack.push(pop());
         }
-    }
 
-    public E[] getStackArr() {
-        return (E[]) stackArr;
+        return returnStack;
     }
 
     /**

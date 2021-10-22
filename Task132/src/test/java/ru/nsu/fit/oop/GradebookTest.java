@@ -40,6 +40,17 @@ class GradebookTest {
         assertFalse(badBook.increasedStipend());
     }
 
+    @Test
+    public void testGradebookRedDiploma() {
+        Gradebook badBook = testBook();
+        Gradebook goodBook = new Gradebook();
+        goodBook.addGrade("Somesubject", 5);
+        goodBook.addGrade("Somesubject1", 5);
+        goodBook.addGrade("Somesubject2", 5);
+        goodBook.addGrade("Somesubject3", 4);
 
+        assertTrue(goodBook.redDiploma());
+        assertFalse(badBook.redDiploma());
+    }
 
 }

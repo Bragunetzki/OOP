@@ -43,11 +43,12 @@ class StackTest {
     @MethodSource("testArrays")
     public void testStackPushStack(int[] arg) {
         Integer[] input = Arrays.stream(arg).boxed().toArray(Integer[]::new);
-        Stack<Integer> testedSack = new Stack<Integer>(input.length);
+        Stack<Integer> testedStack = new Stack<Integer>(input.length);
         Stack<Integer> pushedStack = new Stack<Integer>(input);
 
-        testedSack.pushStack(pushedStack);
-        Stack<Integer> resultStack = testedSack.popStack(input.length);
+        testedStack.pushStack(pushedStack);
+
+        Stack<Integer> resultStack = testedStack.popStack(input.length);
         Integer[] resultArr = new Integer[input.length];
 
         for (int i = 0; i < input.length; i++) {

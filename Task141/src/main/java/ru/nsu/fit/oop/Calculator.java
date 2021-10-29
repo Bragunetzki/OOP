@@ -25,9 +25,24 @@ public class Calculator {
             if (parser.hasNextFloat()) {
                 operands.add(parser.nextFloat());
             }
-            else {
+            else if (parser.hasNext(". ")) {
                 Character token = parser.findInLine(". ").charAt(0);
                 operators.push(token);
+            }
+            else if (parser.hasNext("log ")) {
+                operators.push('l');
+            }
+            else if (parser.hasNext("pow ")) {
+                operators.push('p');
+            }
+            else if (parser.hasNext("sqrt ")) {
+                operators.push('r');
+            }
+            else if (parser.hasNext("sin ")) {
+                operators.push('s');
+            }
+            else if (parser.hasNext("cos")) {
+                operators.push('c');
             }
         }
 
@@ -88,5 +103,51 @@ public class Calculator {
      */
     private static float div(float a, float b) {
         return a/b;
+    }
+
+    /**
+     * Calculates the log of an operand.
+     * @param a - operand to find log of.
+     * @return - returns the log as float value.
+     */
+    private static float log(float a) {
+        return (float) Math.log(a);
+    }
+
+    /**
+     * Calculates the value of operand 'a' to the power of operand 'b'.
+     * @param a - operand a.
+     * @param b - operand b.
+     * @return - returns the power as float value.
+     */
+    private static float pow(float a, float b) {
+        return (float) Math.pow(a, b);
+    }
+
+    /**
+     * Calculates the square root of an operand.
+     * @param a - operand to find square root of.
+     * @return - returns the square root as float value.
+     */
+    private static float sqrt(float a) {
+        return (float) Math.sqrt(a);
+    }
+
+    /**
+     * Calculates the sine of an operand.
+     * @param a - operand to find sine of.
+     * @return - returns the sine as float value.
+     */
+    private static float sin(float a) {
+        return (float) Math.sin(a);
+    }
+
+    /**
+     * Calculates the cosine of an operand.
+     * @param a - operand to find cosine of.
+     * @return - returns the cosine as float value.
+     */
+    private static float cos(float a) {
+        return (float) Math.cos(a);
     }
 }

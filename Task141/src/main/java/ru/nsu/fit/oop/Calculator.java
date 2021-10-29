@@ -4,7 +4,15 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Implements a simple calculator that parses a string in prefix notation.
+ */
 public class Calculator {
+    /**
+     * Parses a string in prefix notation and returns the result.
+     * @param input - the string that needs to be parsed.
+     * @return - returns a result of calculations as float.
+     */
     public static float parse(String input) {
         Scanner parser = new Scanner(input);
 
@@ -42,18 +50,42 @@ public class Calculator {
         return res;
     }
 
+    /**
+     * Calculates sum of two operands.
+     * @param a - operand a.
+     * @param b - operand b.
+     * @return - returns sum of the two operands as float value.
+     */
     private static float sum(float a, float b) {
         return a+b;
     }
 
+    /**
+     * Calculates difference of two operands.
+     * @param a - operand a.
+     * @param b - operand b.
+     * @return - returns difference of two operands as float value.
+     */
     private static float diff(float a, float b) {
         return a-b;
     }
 
+    /**
+     * Calculates the product of two operands.
+     * @param a - operand a.
+     * @param b - operand b.
+     * @return - returns product of two operands as float value.
+     */
     private static float mult(float a, float b) {
         return a*b;
     }
 
+    /**
+     * Calculates the quotient of two operands.
+     * @param a - operand a.
+     * @param b - operand b.
+     * @return - returns the quotient of two operands as float value.
+     */
     private static float div(float a, float b) {
         return a/b;
     }

@@ -8,7 +8,6 @@ import java.util.Map;
  */
 public class Gradebook {
     private HashMap<String, Integer>[] grades;
-    private int gradecount;
 
     /**
      * Initializes the gradebook.
@@ -16,7 +15,6 @@ public class Gradebook {
     public Gradebook() {
         grades = (HashMap<String, Integer>[]) new HashMap[8];
         for (int i = 0; i < 8; i++) grades[i] = new HashMap<String, Integer>();
-        gradecount = 0;
     }
 
     /**
@@ -27,19 +25,24 @@ public class Gradebook {
      * @param grade   - the grade itself.
      */
     public void addGrade(String subject, int sem, Integer grade) {
-        grades[sem - 1].put(subject, grade);
-        gradecount++;
+        if (sem > 8 || sem < 1) throw new IllegalArgumentException("Semester value has to be between 1 and 8!");
+
+        grades[sem - 1].putIfAbsent(subject, grade);
     }
 
     /**
-     * @return - returns the average grade.
+     * Calculates the average grade over all semesters and grades.
+     *
+     * @return - returns the average grade as float value.
      */
     public float averageGrade() {
         float avg = 0;
+        int gradecount = 0;
 
         for (int i = 0; i < 8; i++) {
             for (Map.Entry<String, Integer> entry : grades[i].entrySet()) {
                 avg += entry.getValue();
+                gradecount++;
             }
         }
 
@@ -49,6 +52,8 @@ public class Gradebook {
     }
 
     /**
+     * Checks if an increased stipend can be given this semester.
+     *
      * @param sem - current semester.
      * @return - returns true if an increased stipend is possible.
      */
@@ -65,10 +70,16 @@ public class Gradebook {
     }
 
     /**
+     * Checks if a red diploma can be give.
+     * Conditions for a red diploma:
+     * 1) No '3' grades.
+     * 2) 75% of grades in diploma are '5'.
+     *
      * @return - returns true if a red diploma is possible.
      */
     public boolean redDiploma() {
         Map<String, Integer> diploma = new HashMap<String, Integer>();
+        int gradecount = 0;
 
         for (int i = 0; i < 8; i++) {
             for (Map.Entry<String, Integer> entry : grades[i].entrySet()) {
@@ -77,10 +88,10 @@ public class Gradebook {
                 }
 
                 if (entry.getValue() == 5) {
-                    if (!diploma.containsKey(entry.getKey())) {
-                        diploma.put(entry.getKey(), entry.getValue());
-                    }
+                    diploma.putIfAbsent(entry.getKey(), entry.getValue());
                 }
+
+                gradecount++;
             }
         }
 

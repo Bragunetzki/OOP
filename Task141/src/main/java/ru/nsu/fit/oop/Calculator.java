@@ -9,145 +9,116 @@ import java.util.regex.Pattern;
  */
 public class Calculator {
     /**
-     * Parses a string in prefix notation and returns the result.
+     * Parses a valid prefix notation string and returns the result.
+     *
      * @param input - the string that needs to be parsed.
-     * @return - returns a result of calculations as float.
+     * @return - returns a result of calculations as double.
      */
-    public static float parse(String input) {
+    public static double calculate(String input) {
         Scanner parser = new Scanner(input);
 
         Stack<Character> operators = new Stack<>();
-        Queue<Float> operands = new ArrayDeque<>();
+        Stack<Integer> arities = new Stack<>();
 
+        Stack<Double> operands = new Stack<>();
+        Stack<Integer> operandGroups = new Stack<>();
 
-        //pick apart input into tokens
+        int lastGroup = 0;
+
         while (parser.hasNext()) {
-            if (parser.hasNextFloat()) {
-                operands.add(parser.nextFloat());
-            }
-            else if (parser.hasNext(". ")) {
+
+            if (parser.hasNextDouble()) {
+                operands.push(parser.nextDouble());
+                lastGroup++;
+            } else if (parser.hasNext(".")) {
                 Character token = parser.findInLine(". ").charAt(0);
                 operators.push(token);
-            }
-            else if (parser.hasNext("log ")) {
+                arities.push(2);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
+            } else if (parser.hasNext("log")) {
+                parser.next("log");
                 operators.push('l');
-            }
-            else if (parser.hasNext("pow ")) {
+                arities.push(1);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
+            } else if (parser.hasNext("pow")) {
+                parser.next("pow");
                 operators.push('p');
-            }
-            else if (parser.hasNext("sqrt ")) {
+                arities.push(2);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
+            } else if (parser.hasNext("sqrt")) {
+                parser.next("sqrt");
                 operators.push('r');
-            }
-            else if (parser.hasNext("sin ")) {
+                arities.push(1);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
+            } else if (parser.hasNext("sin")) {
+                parser.next("sin");
                 operators.push('s');
-            }
-            else if (parser.hasNext("cos")) {
+                arities.push(1);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
+            } else if (parser.hasNext("cos")) {
+                parser.next("cos");
                 operators.push('c');
+                arities.push(1);
+                operandGroups.push(lastGroup);
+                lastGroup = 0;
             }
-        }
 
-        //pop tokens out of stacks to finish calculation
-        float res = operands.remove();
+            // System.out.printf("top arity is %d and top groupsize is %d\n", arities.peek(), lastGroup);
+            while (arities.peek() == lastGroup) {
+                double operand1 = operands.pop();
+                double operand2;
+                double res = 0;
 
-        while (!operators.empty()) {
-            switch (operators.pop()) {
-                case ('+') -> res = sum(res, operands.remove());
-                case ('-') -> res = diff(res, operands.remove());
-                case ('*') -> res = mult(res, operands.remove());
-                case ('/') -> res = div(res, operands.remove());
-                default -> {
+                switch (operators.pop()) {
+                    case ('+') -> {
+                        operand2 = operands.pop();
+                        res = operand2 + operand1;
+                    }
+                    case ('-') -> {
+                        operand2 = operands.pop();
+                        res = operand2 - operand1;
+                    }
+                    case ('*') -> {
+                        operand2 = operands.pop();
+                        res = operand2 * operand1;
+                    }
+                    case ('/') -> {
+                        operand2 = operands.pop();
+                        res = operand2 / operand1;
+                    }
+                    case ('l') -> {
+                        res = Math.log(operand1);
+                    }
+                    case ('p') -> {
+                        operand2 = operands.pop();
+                        res = Math.pow(operand2, operand1);
+                    }
+                    case ('r') -> {
+                        res = Math.sqrt(operand1);
+                    }
+                    case ('s') -> {
+                        res = Math.sin(operand1);
+                    }
+                    case ('c') -> {
+                        res = Math.cos(operand1);
+                    }
                 }
+
+                operands.push(res);
+                lastGroup = operandGroups.pop() + 1;
+                arities.pop();
+
+                if (arities.empty()) break;
             }
         }
 
         parser.close();
 
-        return res;
-    }
-
-    /**
-     * Calculates sum of two operands.
-     * @param a - operand a.
-     * @param b - operand b.
-     * @return - returns sum of the two operands as float value.
-     */
-    private static float sum(float a, float b) {
-        return a+b;
-    }
-
-    /**
-     * Calculates difference of two operands.
-     * @param a - operand a.
-     * @param b - operand b.
-     * @return - returns difference of two operands as float value.
-     */
-    private static float diff(float a, float b) {
-        return a-b;
-    }
-
-    /**
-     * Calculates the product of two operands.
-     * @param a - operand a.
-     * @param b - operand b.
-     * @return - returns product of two operands as float value.
-     */
-    private static float mult(float a, float b) {
-        return a*b;
-    }
-
-    /**
-     * Calculates the quotient of two operands.
-     * @param a - operand a.
-     * @param b - operand b.
-     * @return - returns the quotient of two operands as float value.
-     */
-    private static float div(float a, float b) {
-        return a/b;
-    }
-
-    /**
-     * Calculates the log of an operand.
-     * @param a - operand to find log of.
-     * @return - returns the log as float value.
-     */
-    private static float log(float a) {
-        return (float) Math.log(a);
-    }
-
-    /**
-     * Calculates the value of operand 'a' to the power of operand 'b'.
-     * @param a - operand a.
-     * @param b - operand b.
-     * @return - returns the power as float value.
-     */
-    private static float pow(float a, float b) {
-        return (float) Math.pow(a, b);
-    }
-
-    /**
-     * Calculates the square root of an operand.
-     * @param a - operand to find square root of.
-     * @return - returns the square root as float value.
-     */
-    private static float sqrt(float a) {
-        return (float) Math.sqrt(a);
-    }
-
-    /**
-     * Calculates the sine of an operand.
-     * @param a - operand to find sine of.
-     * @return - returns the sine as float value.
-     */
-    private static float sin(float a) {
-        return (float) Math.sin(a);
-    }
-
-    /**
-     * Calculates the cosine of an operand.
-     * @param a - operand to find cosine of.
-     * @return - returns the cosine as float value.
-     */
-    private static float cos(float a) {
-        return (float) Math.cos(a);
+        return operands.pop();
     }
 }

@@ -13,7 +13,7 @@ public class Main {
         String input = reader.readLine();
 
         while (!input.equals("0")) {
-            System.out.printf("Result: %f\n", Calculator.parse(input));
+            System.out.printf("Result: %f\n", Calculator.calculate(input));
             System.out.print("Enter an expression in prefix notation (and use spaces!):");
             input = reader.readLine();
         }

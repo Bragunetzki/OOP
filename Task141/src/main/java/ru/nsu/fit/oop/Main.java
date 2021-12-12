@@ -7,13 +7,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        Calculator calc = new Calculator();
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.print("Enter an expression in prefix notation (and use spaces!):");
         String input = reader.readLine();
 
         while (!input.equals("0")) {
-            System.out.printf("Result: %f\n", Calculator.calculate(input));
+            System.out.printf("Result: %f\n", calc.calculate(input));
             System.out.print("Enter an expression in prefix notation (and use spaces!):");
             input = reader.readLine();
         }

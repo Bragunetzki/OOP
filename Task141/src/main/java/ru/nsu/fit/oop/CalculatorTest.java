@@ -26,6 +26,7 @@ class CalculatorTest {
     @ParameterizedTest
     @MethodSource("testInputs")
     public void testCalculator(String input, double res) {
-        assertEquals(Calculator.calculate(input), res);
+        Calculator calc = new Calculator();
+        assertEquals(calc.calculate(input), res);
     }
 }

@@ -4,25 +4,26 @@ import java.io.InputStream;
 import java.util.*;
 import java.lang.reflect.*;
 
+import static javax.swing.UIManager.put;
+
 /**
  * Implements a simple calculator that parses a string in prefix notation.
  */
-abstract class Calculator {
-    private static final Map<String, Operation> operationMap;
-    static {
-        Map<String, Operation> aMap = new HashMap<String, Operation>();
-        aMap.put("+", new Sum());
-        aMap.put("-", new Diff());
-        aMap.put("*", new Mult());
-        aMap.put("/", new Div());
-        aMap.put("log", new Log());
-        aMap.put("sqrt", new Sqrt());
-        aMap.put("sin", new Sin());
-        aMap.put("pow", new Pow());
-        aMap.put("sin", new Sin());
-        aMap.put("cos", new Cos());
+class Calculator {
+    private Map<String, Operation> operationMap;
 
-        operationMap = Collections.unmodifiableMap(aMap);
+    public Calculator() {
+        operationMap = new HashMap<String, Operation>();
+        operationMap.put("+", new Sum(this));
+        operationMap.put("-", new Diff(this));
+        operationMap.put("*", new Mult(this));
+        operationMap.put("/", new Div(this));
+        operationMap.put("log", new Log(this));
+        operationMap.put("sqrt", new Sqrt(this));
+        operationMap.put("sin", new Sin(this));
+        operationMap.put("pow", new Pow(this));
+        operationMap.put("sin", new Sin(this));
+        operationMap.put("cos", new Cos(this));
     }
 
     /**
@@ -30,7 +31,7 @@ abstract class Calculator {
      * @param operation the token that determines the operation.
      * @return returns an instance of the selected operation.
      */
-    static Operation callOperation(String operation) {
+    Operation callOperation(String operation) {
        return operationMap.get(operation);
     }
 
@@ -39,7 +40,7 @@ abstract class Calculator {
      * @param input - the string that contains the expression.
      * @return - returns the result of the calculation as a double.
      */
-    public static double calculate(String input) {
+    public double calculate(String input) {
         Scanner parser = new Scanner(input);
 
         if (parser.hasNextDouble()) {

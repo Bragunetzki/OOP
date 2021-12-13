@@ -4,14 +4,15 @@ import java.io.InputStream;
 import java.util.*;
 import java.lang.reflect.*;
 
-import static javax.swing.UIManager.put;
-
 /**
  * Implements a simple calculator that parses a string in prefix notation.
  */
-class Calculator {
+public class Calculator {
     private Map<String, Operation> operationMap;
 
+    /**
+     * Calculator constructor that initializes the inner operationMap.
+     */
     public Calculator() {
         operationMap = new HashMap<String, Operation>();
         operationMap.put("+", new Sum(this));
@@ -22,8 +23,16 @@ class Calculator {
         operationMap.put("sqrt", new Sqrt(this));
         operationMap.put("sin", new Sin(this));
         operationMap.put("pow", new Pow(this));
-        operationMap.put("sin", new Sin(this));
         operationMap.put("cos", new Cos(this));
+    }
+
+    /**
+     * Adds a new operation to the Calculator.
+     * @param key - the string key that is mapped to this operation for parsing.
+     * @param newOperation - the added operation.
+     */
+    public void addOperation(String key, Operation newOperation) {
+        operationMap.put(key, newOperation);
     }
 
     /**
@@ -31,7 +40,7 @@ class Calculator {
      * @param operation the token that determines the operation.
      * @return returns an instance of the selected operation.
      */
-    Operation callOperation(String operation) {
+    Operation getOperation(String operation) {
        return operationMap.get(operation);
     }
 
@@ -48,7 +57,7 @@ class Calculator {
         }
 
         String operation = parser.next();
-        Operation op = callOperation(operation);
+        Operation op = getOperation(operation);
         return op.calculate(parser);
     }
 }

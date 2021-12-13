@@ -3,23 +3,16 @@ package ru.nsu.fit.oop;
 import java.util.Scanner;
 
 /**
- * The interface that all operations implement.
+ * The base operation class that all operations inherit.
  */
-abstract class Operation {
-    Calculator parentCalc;
-
+interface Operation {
     /**
      * Contains the actual calculation of an operation. Each operation defines what this method does.
      *
      * @param operands array of operands that are used in operation.
      * @return returns the result of operation as double.
      */
-    abstract double result(double[] operands);
-
-    /**
-     * Gives the arity of each operation.
-     */
-    int arity;
+    double result(double[] operands);
 
     /**
      * Parses the operands needed for the operation.
@@ -29,33 +22,28 @@ abstract class Operation {
      * @param parser the scanner that is used to get values.
      * @return returns the result of operation as double.
      */
-    double calculate(Scanner parser) {
-        double[] operands = new double[2];
-
-        for (int i = 0; i < arity; i++) {
-            if (parser.hasNextDouble()) {
-                operands[i] = parser.nextDouble();
-            } else {
-                Operation oper = parentCalc.callOperation(parser.next());
-                operands[i] = oper.calculate(parser);
-            }
-        }
-
-        return result(operands);
-    }
+    double calculate(Scanner parser);
 }
 
-abstract class BinaryOperation extends Operation {
-    int arity = 2;
+/**
+ * Binary operation base class.
+ */
+abstract class BinaryOperation implements Operation {
+    private int arity = 2;
+    private final Calculator parentCalc;
 
-    double calculate(Scanner parser) {
+    BinaryOperation(Calculator parentCalc) {
+        this.parentCalc = parentCalc;
+    }
+
+    public double calculate(Scanner parser) {
         double[] operands = new double[2];
 
         for (int i = 0; i < 2; i++) {
             if (parser.hasNextDouble()) {
                 operands[i] = parser.nextDouble();
             } else {
-                Operation oper = parentCalc.callOperation(parser.next());
+                Operation oper = parentCalc.getOperation(parser.next());
                 operands[i] = oper.calculate(parser);
             }
         }
@@ -64,16 +52,25 @@ abstract class BinaryOperation extends Operation {
     }
 }
 
-abstract class UnaryOperation extends Operation {
-    int arity = 1;
 
-    double calculate(Scanner parser) {
-        double[] operands = new double[2];
+/**
+ * Unary operation base class.
+ */
+abstract class UnaryOperation implements Operation {
+    private int arity = 1;
+    private final Calculator parentCalc;
+
+    UnaryOperation(Calculator parentCalc) {
+        this.parentCalc = parentCalc;
+    }
+
+    public double calculate(Scanner parser) {
+        double[] operands = new double[1];
 
         if (parser.hasNextDouble()) {
             operands[0] = parser.nextDouble();
         } else {
-            Operation oper = parentCalc.callOperation(parser.next());
+            Operation oper = parentCalc.getOperation(parser.next());
             operands[0] = oper.calculate(parser);
         }
 
@@ -86,11 +83,12 @@ abstract class UnaryOperation extends Operation {
  */
 class Sum extends BinaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return operands[0] + operands[1];
     }
 
     public Sum(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -99,11 +97,12 @@ class Sum extends BinaryOperation {
  */
 class Diff extends BinaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return operands[0] - operands[1];
     }
 
     public Diff(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -112,11 +111,12 @@ class Diff extends BinaryOperation {
  */
 class Mult extends BinaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return operands[0] * operands[1];
     }
 
     public Mult(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -125,11 +125,12 @@ class Mult extends BinaryOperation {
  */
 class Div extends BinaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return operands[0] / operands[1];
     }
 
     public Div(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -138,11 +139,12 @@ class Div extends BinaryOperation {
  */
 class Pow extends BinaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return Math.pow(operands[0], operands[1]);
     }
 
     public Pow(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -151,11 +153,12 @@ class Pow extends BinaryOperation {
  */
 class Log extends UnaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 1) throw new IllegalArgumentException("Wrong operand array size");
         return Math.log(operands[0]);
     }
 
     public Log(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -164,11 +167,12 @@ class Log extends UnaryOperation {
  */
 class Sin extends UnaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 1) throw new IllegalArgumentException("Wrong operand array size");
         return Math.sin(operands[0]);
     }
 
     public Sin(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -177,11 +181,12 @@ class Sin extends UnaryOperation {
  */
 class Cos extends UnaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 1) throw new IllegalArgumentException("Wrong operand array size");
         return Math.cos(operands[0]);
     }
 
     public Cos(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }
 
@@ -190,10 +195,11 @@ class Cos extends UnaryOperation {
  */
 class Sqrt extends UnaryOperation {
     public double result(double[] operands) {
+        if (operands.length != 1) throw new IllegalArgumentException("Wrong operand array size");
         return Math.sqrt(operands[0]);
     }
 
     public Sqrt(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
+        super(parentCalc);
     }
 }

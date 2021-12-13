@@ -5,14 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -29,22 +26,12 @@ public class Notebook {
     private List<Entry> entryArr;
 
     /**
-     * Converts a string into an entry.
-     */
-    private static class EntryConverter implements IStringConverter<Entry> {
-        @Override
-        public Entry convert(String value) {
-            return new Entry(ft.format(new Date()), value);
-        }
-    }
-
-    /**
      * The NotebookCommand class describes a JCommander command and contains the values of entered parameters.
      */
     @Parameters
     private static class NotebookCommand {
-        @Parameter(names = "-add", variableArity = true, converter = EntryConverter.class)
-        private List<Entry> newEntries = new ArrayList<>();
+        @Parameter(names = "-add", variableArity = true)
+        private List<String> newEntries = new ArrayList<>();
 
         @Parameter(names = {"-rm", "-remove"}, variableArity = true)
         private List<String> removedEntries = new ArrayList<>();
@@ -90,8 +77,13 @@ public class Notebook {
      * @throws IOException    - can produce an IOException if failed to read from a file.
      * @throws ParseException - can produce a ParseException if the input string cannot be parsed correctly.
      */
-    public void parse(String input) throws IOException, ParseException {
+    public boolean parse(String input) throws IOException, ParseException {
         String[] args = input.split(" ");
+
+        if (args[0].equals("exit")) {
+            return true;
+        }
+
         notebookCmd.parse(args);
 
         if (!params.removedEntries.isEmpty()) {
@@ -109,6 +101,8 @@ public class Notebook {
         if (params.show) {
             show();
         }
+
+        return false;
     }
 
     /**
@@ -117,7 +111,18 @@ public class Notebook {
      * @throws IOException - throws if file cannot be written to.
      */
     private void add() throws IOException {
-        entryArr.addAll(params.newEntries);
+        List<Entry> temp = new ArrayList<>();
+
+        for (int i = 0; i < params.newEntries.size(); i+=2) {
+            if (i == params.newEntries.size() - 1) {
+                temp.add(new Entry(ft.format(new Date()), params.newEntries.get(i), ""));
+            }
+            else {
+                temp.add(new Entry(ft.format(new Date()), params.newEntries.get(i), params.newEntries.get(i+1)));
+            }
+        }
+
+        entryArr.addAll(temp);
         mapper.writeValue(notebookFile, entryArr);
         params.newEntries.clear();
     }

@@ -29,4 +29,14 @@ class CalculatorTest {
         Calculator calc = new Calculator();
         assertEquals(calc.calculate(input), res);
     }
+
+    @Test
+    public void testCalculatorAddOperation() {
+        Calculator calc = new Calculator();
+        BinaryOperation myaddition = new Sum(calc);
+        calc.addOperation("plus", myaddition);
+        String input = "plus 7 -4";
+
+        assertEquals(calc.calculate(input), 3);
+    }
 }

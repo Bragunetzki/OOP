@@ -1,8 +1,6 @@
 package ru.nsu.fit.oop;
 
-import java.io.InputStream;
 import java.util.*;
-import java.lang.reflect.*;
 
 /**
  * Implements a simple calculator that parses a string in prefix notation.
@@ -16,7 +14,7 @@ public class Calculator {
     public Calculator() {
         operationMap = new HashMap<String, Operation>();
         operationMap.put("+", new Sum(this));
-        operationMap.put("-", new Diff(this));
+        operationMap.put("-", new Sub(this));
         operationMap.put("*", new Mult(this));
         operationMap.put("/", new Div(this));
         operationMap.put("log", new Log(this));

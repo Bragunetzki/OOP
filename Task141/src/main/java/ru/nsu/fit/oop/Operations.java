@@ -5,14 +5,28 @@ import java.util.Scanner;
 /**
  * The base operation class that all operations inherit.
  */
-interface Operation {
+abstract class Operation {
+    private final int arity;
+    private final Calculator parentCalc;
+
     /**
      * Contains the actual calculation of an operation. Each operation defines what this method does.
      *
      * @param operands array of operands that are used in operation.
      * @return returns the result of operation as double.
      */
-    double result(double[] operands);
+    abstract protected double result(double[] operands);
+
+    /**
+     * Operation constructor.
+     *
+     * @param parentCalc - the parent Calculator.
+     * @param arity - the arity of the operation.
+     */
+    public Operation(Calculator parentCalc, int arity) {
+        this.arity = arity;
+        this.parentCalc = parentCalc;
+    }
 
     /**
      * Parses the operands needed for the operation.
@@ -22,24 +36,10 @@ interface Operation {
      * @param parser the scanner that is used to get values.
      * @return returns the result of operation as double.
      */
-    double calculate(Scanner parser);
-}
+    double calculate(Scanner parser) {
+        double[] operands = new double[arity];
 
-/**
- * Binary operation base class.
- */
-abstract class BinaryOperation implements Operation {
-    private int arity = 2;
-    private final Calculator parentCalc;
-
-    BinaryOperation(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
-    }
-
-    public double calculate(Scanner parser) {
-        double[] operands = new double[2];
-
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < arity; i++) {
             if (parser.hasNextDouble()) {
                 operands[i] = parser.nextDouble();
             } else {
@@ -52,29 +52,22 @@ abstract class BinaryOperation implements Operation {
     }
 }
 
+/**
+ * Binary operation base class.
+ */
+abstract class BinaryOperation extends Operation {
+    public BinaryOperation(Calculator parentCalc) {
+        super(parentCalc, 2);
+    }
+}
+
 
 /**
  * Unary operation base class.
  */
-abstract class UnaryOperation implements Operation {
-    private int arity = 1;
-    private final Calculator parentCalc;
-
-    UnaryOperation(Calculator parentCalc) {
-        this.parentCalc = parentCalc;
-    }
-
-    public double calculate(Scanner parser) {
-        double[] operands = new double[1];
-
-        if (parser.hasNextDouble()) {
-            operands[0] = parser.nextDouble();
-        } else {
-            Operation oper = parentCalc.getOperation(parser.next());
-            operands[0] = oper.calculate(parser);
-        }
-
-        return result(operands);
+abstract class UnaryOperation extends Operation {
+    public UnaryOperation(Calculator parentCalc) {
+        super(parentCalc, 1);
     }
 }
 
@@ -95,13 +88,13 @@ class Sum extends BinaryOperation {
 /**
  * Substracts one number from another.
  */
-class Diff extends BinaryOperation {
+class Sub extends BinaryOperation {
     public double result(double[] operands) {
         if (operands.length != 2) throw new IllegalArgumentException("Wrong operand array size");
         return operands[0] - operands[1];
     }
 
-    public Diff(Calculator parentCalc) {
+    public Sub(Calculator parentCalc) {
         super(parentCalc);
     }
 }

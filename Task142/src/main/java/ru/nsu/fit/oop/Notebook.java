@@ -81,7 +81,7 @@ public class Notebook {
         String[] args = input.split(" ");
 
         if (args[0].equals("exit")) {
-            return true;
+            return false;
         }
 
         notebookCmd.parse(args);
@@ -102,7 +102,7 @@ public class Notebook {
             show();
         }
 
-        return false;
+        return true;
     }
 
     /**

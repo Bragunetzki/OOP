@@ -1,5 +1,8 @@
 package ru.nsu.fit.oop;
 
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -39,7 +42,8 @@ public class Calculator {
      * @return returns an instance of the selected operation.
      */
     Operation getOperation(String operation) {
-       return operationMap.get(operation);
+        if (!operationMap.containsKey(operation)) throw new IllegalArgumentException("Unknown operation.");
+        return operationMap.get(operation);
     }
 
     /**

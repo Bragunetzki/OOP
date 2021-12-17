@@ -39,4 +39,10 @@ class CalculatorTest {
 
         assertEquals(calc.calculate(input), 3);
     }
+
+    @Test
+    public void testCalculatorInvalidInput() {
+        Calculator calc = new Calculator();
+        assertThrows(IllegalArgumentException.class, ()->calc.calculate("wrong operation"));
+    }
 }

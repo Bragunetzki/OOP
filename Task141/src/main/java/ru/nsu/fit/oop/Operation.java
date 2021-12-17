@@ -5,7 +5,7 @@ import java.util.Scanner;
 /**
  * The base operation class that all operations inherit.
  */
-abstract class Operation {
+public abstract class Operation {
     private final int arity;
     private final Calculator parentCalc;
 

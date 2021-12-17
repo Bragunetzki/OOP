@@ -1,85 +1,154 @@
 package ru.nsu.fit.oop;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 public class Tree<E> implements Collection<E> {
     private E val;
-    private Tree<E> parent;
-    private List<Tree<E>> children;
-    private int size;
+    private Tree<E> parent, left, right;
+
+    private int lsize;
+    private int rsize;
+
+    public Tree(E data, Tree<E> parent) {
+        this.parent = parent;
+        val = data;
+        lsize = 0;
+        rsize = 0;
+    }
 
     public Tree(E data) {
-        val = data;
-        children = new ArrayList<Tree<E>>();
+        this(data, null);
     }
 
-    public Tree() {
-        children = new ArrayList<Tree<E>>():
-    }
+    public Tree() { }
 
     public Tree(Tree<E> tree) {
+        this.addAll(tree);
+    }
 
+    public E value() {
+        return val;
+    }
+
+    public Tree<E> getParent() {
+        return parent;
+    }
+
+    public Tree<E> getLeft() {
+        return left;
+    }
+
+    public Tree<E> getRight() {
+        return right;
+    }
+
+    public int getLsize() {
+        return lsize;
+    }
+
+    public int getRsize() {
+        return rsize;
+    }
+
+    public void set(E e) {
+        if (e == null) throw new NullPointerException();
+        val = e;
     }
 
     @Override
     public int size() {
-        return size;
+        return lsize + rsize + (val == null ? 0 : 1);
     }
 
     @Override
     public boolean isEmpty() {
-        return (size == 0);
+        return (size() == 0);
     }
 
     @Override
     public boolean contains(Object o) {
+        for (E e : this) {
+            if (o.equals(e)) return true;
+        }
         return false;
     }
 
     @Override
     public Iterator<E> iterator() {
-        return new TreeIterator();
+        return new TreeIterator(this);
     }
 
-    @Override
-    public Spliterator<E> spliterator() {
-        return new TreeSpliterator();
-    }
+    private class TreeIterator implements Iterator<E> {
+        private Queue<Tree<E>> queue;
+        private E next;
+        private Tree<E> nextTree;
 
-    public class TreeSpliterator implements Spliterator<E> {
-
-        @Override
-        public boolean tryAdvance(Consumer<? super E> action) {
-            return false;
+        public TreeIterator(Tree<E> parentTree) {
+            next = val;
+            queue = new LinkedList<>();
+            nextTree = parentTree;
         }
 
         @Override
-        public Spliterator<E> trySplit() {
-            return null;
+        public boolean hasNext() {
+            return next != null;
         }
 
         @Override
-        public long estimateSize() {
-            return 0;
-        }
+        public E next() {
+            E res = next;
 
-        @Override
-        public int characteristics() {
-            return 0;
+            if (nextTree.getLsize() > 0) {
+                queue.add(nextTree.getLeft());
+            }
+            if (nextTree.getRsize() > 0) {
+                queue.add(nextTree.getRight());
+            }
+
+            if (queue.isEmpty()) {
+                next = null;
+            }
+            else {
+                nextTree = queue.remove();
+                next = nextTree.value();
+            }
+
+            return res;
         }
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] arr = new Object[size()];
+
+        int i = 0;
+        for (E e : this) {
+            arr[i] = e;
+            i++;
+        }
+
+        return arr;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
-        return null;
+        if (a.length < size()) {
+            return (T[]) toArray();
+        }
+        else {
+            int i = 0;
+            for (E e: this) {
+                a[i] = (T) e;
+                i++;
+            }
+        }
+
+        if (a.length > size()) a[size()] = null;
+
+        return a;
     }
+
 
     @Override
     public boolean add(E e) {
@@ -89,30 +158,37 @@ public class Tree<E> implements Collection<E> {
         if (val == null) {
             //If the tree is empty, the head of the tree is added.
             val = e;
-        } else if (children.isEmpty()) {
-            //If the tree has no children, add the first one.
-            children.add(new Tree<E>(e));
-            children.get(0).parent = this;
-        }
-        else {
-            //If the tree has children, randomly decide between
-            //adding a new child to the tree or one of its subtrees.
-            int whereto = ThreadLocalRandom.current().nextInt(-1, children.size());
-            if (whereto == -1) {
-                //Add a new child to the tree.
-                children.add(new Tree<E>(e));
-                children.get(children.size()-1).parent = this;
+        } else {
+            if (lsize <= rsize) {
+                if (lsize == 0) {
+                    left = new Tree<E>(e, this);
+                }
+                else {
+                    left.add(e);
+                }
+                lsize++;
             }
             else {
-                //recursively add the child to one of the children.
-                children.get(whereto).add(e);
+                if (rsize == 0) {
+                    right = new Tree<E>(e, this);
+                }
+                else {
+                    right.add(e);
+                }
+                rsize++;
             }
         }
+
         return true;
     }
 
     @Override
     public boolean remove(Object o) {
+        if (o == null) throw new NullPointerException();
+
+        Queue<Tree<E>> queue = new LinkedList<>();
+
+
         return false;
     }
 
@@ -123,7 +199,15 @@ public class Tree<E> implements Collection<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        boolean flag = false;
+        for (E e : c) {
+            if (e == null) throw new NullPointerException();
+
+            add(e);
+            flag = true;
+        }
+
+        return flag;
     }
 
     @Override

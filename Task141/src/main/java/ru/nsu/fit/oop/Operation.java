@@ -52,24 +52,6 @@ public abstract class Operation {
     }
 }
 
-/**
- * Binary operation base class.
- */
-abstract class BinaryOperation extends Operation {
-    public BinaryOperation(Calculator parentCalc) {
-        super(parentCalc, 2);
-    }
-}
-
-
-/**
- * Unary operation base class.
- */
-abstract class UnaryOperation extends Operation {
-    public UnaryOperation(Calculator parentCalc) {
-        super(parentCalc, 1);
-    }
-}
 
 /**
  * Calculates the sum of two numbers.

@@ -41,7 +41,7 @@ public class Calculator {
      * @param operation the token that determines the operation.
      * @return returns an instance of the selected operation.
      */
-    Operation getOperation(String operation) {
+    public Operation getOperation(String operation) {
         if (!operationMap.containsKey(operation)) throw new IllegalArgumentException("Unknown operation.");
         return operationMap.get(operation);
     }

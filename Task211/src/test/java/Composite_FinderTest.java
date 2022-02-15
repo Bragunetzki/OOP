@@ -1,4 +1,7 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,13 +12,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class Composite_FinderTest {
 
-    @Test
-    public void Composite_FinderTest_Comparison() throws InterruptedException {
+    static ArrayList<ArrayList<Integer>> testLists() {
+        var list = new ArrayList<ArrayList<Integer>>();
+
+        list.add(new ArrayList<>(Arrays.asList(6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053)));
+
+        return list;
+    }
+
+    @ParameterizedTest
+    @MethodSource("testLists")
+    public void Composite_FinderTest_Comparison(ArrayList<Integer> list) throws InterruptedException {
         long sequential_time0, sequential_time1, stream_time0, stream_time1;
         long[] multithread_time0 = new long[4];
         long[] multithread_time1 = new long[4];
-
-        List<Integer> list = Arrays.asList(6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053);
 
         sequential_time0 = System.currentTimeMillis();
         assertFalse(Composite_Finder.contains_composite_sequential(list));

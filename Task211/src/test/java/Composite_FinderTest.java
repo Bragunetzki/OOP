@@ -3,6 +3,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +17,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class Composite_FinderTest {
 
-    static ArrayList<ArrayList<Integer>> testLists() {
+    static ArrayList<ArrayList<Integer>> testLists() throws IOException {
         var list = new ArrayList<ArrayList<Integer>>();
 
         list.add(new ArrayList<>(Arrays.asList(6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053)));
+        ArrayList<Integer> primes = new ArrayList<>(300);
+        try {
+            FileReader rdr = new FileReader("primes.txt");
+            BufferedReader buff_reader = new BufferedReader(rdr);
+            for (int i = 0; i < 300; i++) {
+                primes.add(Integer.valueOf(buff_reader.readLine()));
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        list.add(primes);
 
         return list;
     }

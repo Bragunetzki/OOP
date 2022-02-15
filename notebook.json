@@ -1,8 +1,4 @@
 [ {
-  "date" : "13.12.2021;06:19",
-  "name" : "note1",
-  "content" : ""
-}, {
   "date" : "13.12.2021;06:28",
   "name" : "note5",
   "content" : ""
@@ -14,4 +10,12 @@
   "date" : "16.12.2021;10:20",
   "name" : "hello",
   "content" : "there"
+}, {
+  "date" : "01.01.2022;04:58",
+  "name" : "note1",
+  "content" : "content1"
+}, {
+  "date" : "01.01.2022;04:58",
+  "name" : "note2",
+  "content" : "content2"
 } ]

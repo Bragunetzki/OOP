@@ -8,7 +8,7 @@ import static java.lang.Math.sqrt;
 /**
  * Finds composite numbers in lists using three different solutions.
  */
-public abstract class Composite_Finder {
+public abstract class CompositeFinder {
     /**
      * Determines if the number n is composite or not.
      * @param n - the number that has to be tested.
@@ -30,7 +30,7 @@ public abstract class Composite_Finder {
      * @param list - the list withing which to search.
      * @return - returns true if list has at least one composite number.
      */
-    public static boolean contains_composite_sequential(List<Integer> list) {
+    public static boolean containsCompositeSequential(List<Integer> list) {
         for (Integer i : list) {
             if (isComposite(i)) {
                 return true;
@@ -45,8 +45,8 @@ public abstract class Composite_Finder {
      * @param list - the list withing which to search.
      * @return - returns true if list has at least one composite number.
      */
-    public static boolean contains_composite_stream(List<Integer> list) {
-        List<Integer> filteredList = list.parallelStream().filter(Composite_Finder::isComposite).toList();
+    public static boolean containsCompositeStream(List<Integer> list) {
+        List<Integer> filteredList = list.parallelStream().filter(CompositeFinder::isComposite).toList();
         return !filteredList.isEmpty();
     }
 
@@ -57,24 +57,27 @@ public abstract class Composite_Finder {
      * @param tNum - the number of threads to split the array into.
      * @return - returns true if list has at least one composite number.
      */
-    public static boolean contains_composite_threaded(List<Integer> list, int tNum) throws InterruptedException {
+    public static boolean containsCompositeThreaded(List<Integer> list, int tNum) throws InterruptedException {
         if (tNum > list.size()) throw new InvalidParameterException("Number of threads cannot exceed number of array elements!");
-        int partition_size = list.size() / tNum;
+        int partitionSize = list.size() / tNum;
 
         AtomicBoolean res = new AtomicBoolean(false);
 
         List<Thread> threads = new ArrayList<>(tNum);
         for (int i = 0; i < tNum; i++) {
-            int start = i*partition_size;
+            int start = i*partitionSize;
             int end;
             if (i == tNum -1) end = list.size();
-                else end = Math.min(start + partition_size, list.size());
+                else end = Math.min(start + partitionSize, list.size());
 
             threads.add(new Thread(() -> {
                 List<Integer> threadList = list.subList(start, end);
                 for (Integer n : threadList) {
-                    if (isComposite(n) || res.get()) {
+                    if (isComposite(n)) {
                         res.set(true);
+                        break;
+                    }
+                    if (res.get()) {
                         break;
                     }
                 }

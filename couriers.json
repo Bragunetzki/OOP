@@ -1,0 +1,13 @@
+[ {
+  "orderTime" : 5000,
+  "baggageCap" : 3
+}, {
+  "orderTime" : 8000,
+  "baggageCap" : 5
+}, {
+  "orderTime" : 4000,
+  "baggageCap" : 1
+}, {
+  "orderTime" : 10000,
+  "baggageCap" : 4
+} ]

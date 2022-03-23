@@ -1,121 +1,108 @@
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-public class Pizzeria implements Runnable {
-    private int warehouseSize;
-    private int queuedOrder;
-    private LinkedList<Integer> orderQueue;
-    private LinkedList<Integer> warehouse;
-    private List<Baker> bakers;
-    private List<Courier> couriers;
-    private AtomicBoolean enabled;
-    private AtomicInteger ordersCompleted;
-    private int totalOrders;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-    public synchronized void acceptNewOrder() {
-        queuedOrder++;
-        orderQueue.add(queuedOrder);
+/**
+ * Class that simulates a pizzeria with a list of bakers, a list of couriers, a queue of orders and a warehouse.
+ */
+public class Pizzeria {
+    private final List<Baker> bakers;
+    private final List<Courier> couriers;
+    private Warehouse warehouse;
+    private final OrderQueue orderQueue;
+
+    /**
+     * @return - returns the pizzeria's warehouse object.
+     */
+    public Warehouse getWarehouse() {
+        return warehouse;
     }
 
-    synchronized void completeOrder(int order) {
-        System.out.println("[" + order + "], [complete]");
-        ordersCompleted.set(ordersCompleted.get()+1);
+    /**
+     * @return - returns the pizzeria's order queue object.
+     */
+    public OrderQueue getOrderQueue() {
+        return orderQueue;
     }
 
-    synchronized boolean orderQueueEmpty() {
-        return orderQueue.isEmpty();
+    /**
+     * Return the number of pizzeria workers, which is the sum of the number of bakers and the number of couriers.
+     * @return - the number of workers.
+     */
+    public int numberOfWorkers() {
+        return bakers.size() + couriers.size();
     }
 
-    synchronized void storeOrder(int order) throws InterruptedException {
-        if (warehouse.size() >= warehouseSize) wait();
-        warehouse.add(order);
-        System.out.println("[" + order + "], [in warehouse]");
+    /**
+     * @return - returns the list of pizzeria bakers.
+     */
+    public List<Baker> getBakers() {
+        return bakers;
     }
 
-    public Pizzeria(int totalOrders) {
-        this.totalOrders = totalOrders;
-        ordersCompleted = new AtomicInteger(0);
-        enabled = new AtomicBoolean(true);
+    /**
+     * @return - returns the list of pizzeri couriers.
+     */
+    public List<Courier> getCouriers() {
+        return couriers;
+    }
+
+    /**
+     * Prints the message that an order is complete.
+     * @param order - the number of the order that is complete.
+     */
+    void completeOrder(int order) {
+        System.out.println("[" + order + "], [complete]!");
+    }
+
+    /**
+     * Basic constructor. The Pizzeria initializes a new orderQueue, a new Warehouse of specified size,
+     * all couriers and bakers. It also sorts the lists of bakers and couriers by efficiency.
+     * @param pizzeriaFile - handle of .json file containing pizzeria parameters.
+     * @param bakersFile - handle of .json file containing baker parameters.
+     * @param couriersFile - handle of .json file containing courier parameters.
+     */
+    public Pizzeria(File pizzeriaFile, File bakersFile, File couriersFile) {
+        orderQueue = new OrderQueue();
         List<BakerParams> bakerParamsList = new ArrayList<>();
         List<CourierParams> courierParamsList = new ArrayList<>();
-        queuedOrder = 0;
-        orderQueue = new LinkedList<>();
-        warehouse = new LinkedList<>();
         bakers = new ArrayList<>();
         couriers = new ArrayList<>();
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
-            PizzeriaParams params = mapper.readValue(new File("pizzeria.json"), PizzeriaParams.class);
-            warehouseSize = params.getWareHouseSize();
-            bakerParamsList = mapper.readValue(new File("bakers.json"), new TypeReference<>() {
+            PizzeriaParams params = mapper.readValue(pizzeriaFile, PizzeriaParams.class);
+            warehouse = new Warehouse(params.getWareHouseSize());
+            bakerParamsList = mapper.readValue(bakersFile, new TypeReference<>() {
             });
-            courierParamsList = mapper.readValue(new File("couriers.json"), new TypeReference<>() {
+            courierParamsList = mapper.readValue(couriersFile, new TypeReference<>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         for (BakerParams bakerParams : bakerParamsList) {
-            bakers.add(new Baker(this, bakerParams.getOrderTime()));
+            bakers.add(new Baker(warehouse, bakerParams.getOrderTime()));
         }
         for (CourierParams courierParams : courierParamsList) {
             couriers.add(new Courier(this, courierParams.getOrderTime(), courierParams.getBaggageCap()));
         }
 
-        bakers.sort(new cookComparator());
-        couriers.sort(new courierComparator());
+        bakers.sort(Comparator.comparingInt(Baker::getOrderTime));
+        couriers.sort(Comparator.comparingInt(Courier::getOrderTime));
     }
 
-    @Override
-    public void run() {
-        ExecutorService service = Executors.newFixedThreadPool(bakers.size() + couriers.size());
-
-        while (ordersCompleted.get() < totalOrders) {
-            //assign any pending orders to available bakers.
-            for (Baker b : bakers) {
-                if (orderQueue.isEmpty()) break;
-
-                if (b.isAvailable()) {
-                    b.setCurrentOrder(orderQueue.removeFirst());
-                    service.submit(b);
-                    System.out.println("[" + b.getCurrentOrder() + "], [cooking]");
-                }
-            }
-
-
-            //assign any stored orders to available couriers.
-            for (Courier c : couriers) {
-                if (warehouse.isEmpty()) break;
-                if (c.isAvailable()) {
-                    synchronized (this) {
-                        for (int i = 0; i < c.getBaggageCap() && !warehouse.isEmpty(); i++) {
-                            int o = warehouse.removeFirst();
-                            notifyAll();
-                            System.out.println("[" + o + "], [in delivery]");
-                            c.addOrder(o);
-                        }
-                        service.submit(c);
-                    }
-                }
-            }
-        }
-        service.shutdown();
-    }
-
+    /**
+     * Class that is used for storing parameters serialized from .json file.
+     */
     static class PizzeriaParams {
         private int warehouseSize;
 
@@ -133,20 +120,6 @@ public class Pizzeria implements Runnable {
 
         public void setWarehouseSize(int warehouseSize) {
             this.warehouseSize = warehouseSize;
-        }
-    }
-
-    private static class cookComparator implements Comparator<Baker> {
-        @Override
-        public int compare(Baker o1, Baker o2) {
-            return Long.compare(o1.getOrderTime(), o2.getOrderTime());
-        }
-    }
-
-    private static class courierComparator implements Comparator<Courier> {
-        @Override
-        public int compare(Courier o1, Courier o2) {
-            return Long.compare(o1.getOrderTime(), o2.getOrderTime());
         }
     }
 }

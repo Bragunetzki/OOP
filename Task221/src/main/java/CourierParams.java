@@ -1,7 +1,9 @@
+/**
+ * Class that holds a client's parameters serialized from .json file.
+ */
 public class CourierParams {
     private int orderTime;
     private int baggageCap;
-
 
     public int getOrderTime() {
         return orderTime;

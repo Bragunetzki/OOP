@@ -1,3 +1,6 @@
+/**
+ * Class that holds a baker's parameters serialized from .json file.
+ */
 public class BakerParams {
     private int orderTime;
 

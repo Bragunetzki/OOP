@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -44,6 +46,7 @@ public class OrderQueue {
      */
     public synchronized void acceptNewOrder() {
         orders.add(++queuedOrder);
+        notifyAll();
     }
 
     /**

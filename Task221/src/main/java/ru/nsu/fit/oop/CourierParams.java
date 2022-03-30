@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 /**
  * Class that holds a client's parameters serialized from .json file.
  */

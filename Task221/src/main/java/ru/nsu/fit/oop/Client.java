@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import java.util.Random;
 import java.util.concurrent.Callable;
 
@@ -12,7 +14,7 @@ public class Client implements Callable<Void> {
 
     /**
      * Basic client constructor.
-     * @param orderQueue - the orderQueue into which the Client will sumbit their orders.
+     * @param orderQueue - the orderQueue into which the ru.nsu.fit.oop.Client will sumbit their orders.
      * @param totalOrders - the total number of orders that the client should complete.
      */
     public Client(OrderQueue orderQueue, int totalOrders) {
@@ -23,7 +25,6 @@ public class Client implements Callable<Void> {
 
     /**
      * Activates a client. They will submit the totalOrders number of orders at random intervals of 1-4 seconds.
-     * The first order is submitted immediately.
      * @return - void.
      * @throws InterruptedException - throws exception if sleep is interrupted.
      */

@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,7 +22,7 @@ public class PizzeriaManager implements Runnable {
     /**
      * Runs the manager. It will attempt to assign orders from the pizzeria's orderQueue to available bakers,
      * starting with the fastest baker. It will do the same for couriers as long as the warehouse contains any orders.
-     * The manager stops working after the orderQueue becomes disabled (most likely because a ClientManager disabled it),
+     * The manager stops working after the orderQueue becomes disabled (most likely because a ru.nsu.fit.oop.ClientManager disabled it),
      * the warehouse is empty and no couriers or bakers are active.
      */
     @Override
@@ -31,16 +33,14 @@ public class PizzeriaManager implements Runnable {
         Warehouse warehouse = workingPizzeria.getWarehouse();
         OrderQueue orderQueue = workingPizzeria.getOrderQueue();
 
-        while (orderQueue.isEnabled() || !warehouse.isEmpty() || service.getActiveCount() != 0) {
+        while (orderQueue.isEnabled() || workingPizzeria.getOrdersTotal() != warehouse.getOrdersCompleted()) {
             //assign any pending orders to available bakers.
             for (Baker b : bakers) {
                 if (orderQueue.isEmpty()) break;
-
                 if (b.isAvailable()) {
                     synchronized (this) {
                         b.setCurrentOrder(orderQueue.takeOrder());
                         service.submit(b);
-                        System.out.println("[" + b.getCurrentOrder() + "], [cooking]");
                     }
                 }
             }
@@ -48,23 +48,10 @@ public class PizzeriaManager implements Runnable {
             for (Courier c : couriers) {
                 if (warehouse.isEmpty()) break;
                 if (c.isAvailable()) {
-                    synchronized (this) {
-                        for (int i = 0; i < c.getBaggageCap() && !warehouse.isEmpty(); i++) {
-                            int o = warehouse.removeOrder();
-                            notifyAll();
-                            System.out.println("[" + o + "], [in delivery]");
-                            c.addOrder(o);
-                        }
-                        service.submit(c);
-                    }
+                    service.submit(c);
                 }
             }
         }
         service.shutdown();
-        try {
-            service.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -7,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class that simulates a pizzeria with a list of bakers, a list of couriers, a queue of orders and a warehouse.
@@ -17,6 +18,15 @@ public class Pizzeria {
     private final List<Courier> couriers;
     private Warehouse warehouse;
     private final OrderQueue orderQueue;
+    private int ordersTotal;
+
+    public int getOrdersTotal() {
+        return ordersTotal;
+    }
+
+    public void setOrdersTotal(int total) {
+        ordersTotal = total;
+    }
 
     /**
      * @return - returns the pizzeria's warehouse object.
@@ -55,15 +65,7 @@ public class Pizzeria {
     }
 
     /**
-     * Prints the message that an order is complete.
-     * @param order - the number of the order that is complete.
-     */
-    void completeOrder(int order) {
-        System.out.println("[" + order + "], [complete]!");
-    }
-
-    /**
-     * Basic constructor. The Pizzeria initializes a new orderQueue, a new Warehouse of specified size,
+     * Basic constructor. The ru.nsu.fit.oop.Pizzeria initializes a new orderQueue, a new ru.nsu.fit.oop.Warehouse of specified size,
      * all couriers and bakers. It also sorts the lists of bakers and couriers by efficiency.
      * @param pizzeriaFile - handle of .json file containing pizzeria parameters.
      * @param bakersFile - handle of .json file containing baker parameters.
@@ -71,6 +73,7 @@ public class Pizzeria {
      */
     public Pizzeria(File pizzeriaFile, File bakersFile, File couriersFile) {
         orderQueue = new OrderQueue();
+        ordersTotal = 0;
         List<BakerParams> bakerParamsList = new ArrayList<>();
         List<CourierParams> courierParamsList = new ArrayList<>();
         bakers = new ArrayList<>();
@@ -93,7 +96,7 @@ public class Pizzeria {
             bakers.add(new Baker(warehouse, bakerParams.getOrderTime()));
         }
         for (CourierParams courierParams : courierParamsList) {
-            couriers.add(new Courier(this, courierParams.getOrderTime(), courierParams.getBaggageCap()));
+            couriers.add(new Courier(warehouse, courierParams.getOrderTime(), courierParams.getBaggageCap()));
         }
 
         bakers.sort(Comparator.comparingInt(Baker::getOrderTime));

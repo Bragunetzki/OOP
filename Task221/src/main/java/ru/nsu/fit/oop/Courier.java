@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -7,10 +9,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Class that simulates a pizzeria courier.
  */
 public class Courier implements Callable<Void> {
-    private int orderTime;
-    private int baggageCap;
+    private final int orderTime;
+    private final int baggageCap;
     private ArrayList<Integer> orders;
-    private Pizzeria parentPizzeria;
+    private final Warehouse parentWarehouse;
     AtomicBoolean available;
 
     /**
@@ -22,21 +24,6 @@ public class Courier implements Callable<Void> {
     }
 
     /**
-     * Returns the baggageCap of the courier.
-     * @return - the baggageCap.
-     */
-    int getBaggageCap() { return baggageCap; }
-
-    /**
-     * Adds an order to the courier's list of orders. Throws a RuntimeException if the courier's number of orders exceeds baggageCap.
-     * @param order - the number of the order that will be added.
-     */
-    void addOrder(int order) {
-        if (orders.size() >= baggageCap) throw new RuntimeException("cannot add orders to a full courier!");
-        orders.add(order);
-    }
-
-    /**
      * @return - returns true if courier is available for work.
      */
     boolean isAvailable() {
@@ -45,11 +32,11 @@ public class Courier implements Callable<Void> {
 
     /**
      * Basic constructor.
-     * @param parentPizzeria - the pizzeria that the Courier will work with.
+     * @param parentWarehouse - the warehouse that the Courier will work with.
      * @param orderTime - the time in miliseconds that it takes to complete an order.
      * @param baggageCap - the maximum number of orders that a courier can carry.
      */
-    public Courier(Pizzeria parentPizzeria, int orderTime, int baggageCap) {
+    public Courier(Warehouse parentWarehouse, int orderTime, int baggageCap) {
         if (orderTime <= 0 || baggageCap <= 0) {
             throw new InvalidParameterException("courier order time and baggage cap must be above zero!");
         }
@@ -57,7 +44,7 @@ public class Courier implements Callable<Void> {
         available = new AtomicBoolean(true);
         this.orderTime = orderTime;
         this.baggageCap = baggageCap;
-        this.parentPizzeria = parentPizzeria;
+        this.parentWarehouse = parentWarehouse;
         orders = new ArrayList<>();
     }
 
@@ -69,11 +56,19 @@ public class Courier implements Callable<Void> {
     @Override
     public Void call() throws InterruptedException {
         available.set(false);
+
+        //get orders
+        synchronized (this) {
+            orders.addAll(parentWarehouse.takeOrderList(baggageCap));
+        }
+
+        //delivery
         for (Integer i : orders) {
             Thread.sleep(orderTime);
-            parentPizzeria.completeOrder(i);
+            parentWarehouse.completeOrder();
+            System.out.println("[" + i + "], [complete]!");
         }
-        orders = new ArrayList<>();
+        orders.clear();
         available.set(true);
         return null;
     }

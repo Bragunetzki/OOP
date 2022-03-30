@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,12 +18,14 @@ import java.util.concurrent.TimeUnit;
 public class ClientManager implements Runnable {
     private List<Client> clients;
     private Pizzeria parentPizzeria;
+    private int totalOrders;
 
     /**
      * Basic constructor. Reads all clients from a .json file.
      * @param parentPizzeria - the pizzeria that the managed clients will interact with.
      */
     public ClientManager(Pizzeria parentPizzeria, String file) {
+        totalOrders = 0;
         this.parentPizzeria = parentPizzeria;
         clients = new ArrayList<>();
         List<ClientParams> clientParamsList = new ArrayList<>();
@@ -37,11 +41,13 @@ public class ClientManager implements Runnable {
 
         for (ClientParams clientParams : clientParamsList) {
             clients.add(new Client(parentPizzeria.getOrderQueue(), clientParams.getTotalOrders()));
+            this.totalOrders+=clientParams.getTotalOrders();
         }
+        parentPizzeria.setOrdersTotal(totalOrders);
     }
 
     /**
-     * Runs the ClientManager. It will invoke all clients and wait for them to terminate.
+     * Runs the ru.nsu.fit.oop.ClientManager. It will invoke all clients and wait for them to terminate.
      */
     @Override
     public void run() {

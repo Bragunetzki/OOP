@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 import java.security.InvalidParameterException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +25,7 @@ public class Baker implements Callable<Void> {
      * Sets the current order of the baker to a new value.
      * @param order - the new value of the order.
      */
-    void setCurrentOrder(int order) {
+    public void setCurrentOrder(int order) {
         currentOrder = order;
     }
 
@@ -66,7 +68,10 @@ public class Baker implements Callable<Void> {
     @Override
     public Void call() throws InterruptedException {
         available.set(false);
+        System.out.println("[" + currentOrder + "], [cooking]");
+
         Thread.sleep(orderTime);
+
         parentWarehouse.storeOrder(currentOrder);
         available.set(true);
         return null;

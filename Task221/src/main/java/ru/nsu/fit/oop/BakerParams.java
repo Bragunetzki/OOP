@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop;
+
 /**
  * Class that holds a baker's parameters serialized from .json file.
  */

@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop.task321.model;
+
 import java.security.InvalidParameterException;
 
 public class Map {

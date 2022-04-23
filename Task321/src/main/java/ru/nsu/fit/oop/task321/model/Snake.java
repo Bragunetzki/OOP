@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop.task321.model;
+
 import java.util.LinkedList;
 
 public class Snake {

@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop.task321.model;
+
 public class Cell {
     private int x;
     private int y;

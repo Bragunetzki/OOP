@@ -1,3 +1,5 @@
+package ru.nsu.fit.oop.task321.model;
+
 public class Game {
     private final Snake[] snakes;
     private final Map map;

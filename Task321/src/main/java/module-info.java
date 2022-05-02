@@ -7,4 +7,8 @@ module ru.nsu.fit.oop.task321 {
 
     opens ru.nsu.fit.oop.task321 to javafx.fxml;
     exports ru.nsu.fit.oop.task321;
+    exports ru.nsu.fit.oop.task321.view;
+    exports ru.nsu.fit.oop.task321.model;
+    exports ru.nsu.fit.oop.task321.controller;
+    opens ru.nsu.fit.oop.task321.view to javafx.fxml;
 }

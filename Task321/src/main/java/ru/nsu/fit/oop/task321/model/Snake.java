@@ -1,14 +1,18 @@
 package ru.nsu.fit.oop.task321.model;
 
+import ru.nsu.fit.oop.task321.controller.ControlledSnake;
+
 import java.util.LinkedList;
 
-public class Snake {
+public class Snake implements ControlledSnake {
     private LinkedList<Cell> parts;
     private Cell head;
+    private GameModel game;
 
     private Direction direction;
 
-    public Snake(Cell startingPosition, Direction direction) {
+    public Snake(GameModel game, Cell startingPosition, Direction direction) {
+        this.game = game;
         parts = new LinkedList<>();
         startingPosition.setType(CellType.SNAKE);
         parts.add(startingPosition);
@@ -16,21 +20,20 @@ public class Snake {
         this.direction = direction;
     }
 
-    public Snake(Cell startingPosition) {
-        new Snake(startingPosition, Direction.TOP);
+    public Snake(GameModel game, Cell startingPosition) {
+        this(game, startingPosition, Direction.TOP);
     }
 
     public boolean update(Cell newCell) {
-        boolean isFood = newCell.getType() == CellType.FOOD;
+        if (newCell.getType() == CellType.FOOD) {
+            parts.add(parts.getLast());
+            game.foodConsumed();
+        }
         if (checkCrash(newCell)) {
-            clear();
-            //tell game that snake is destroyed
+            destroy();
+            game.snakeDestroyed(this);
         }
         move(newCell);
-        if (isFood) {
-            grow();
-            //tell game to generate new food
-        }
         return true;
     }
 
@@ -39,19 +42,16 @@ public class Snake {
         tail.setType(CellType.FREE);
         head = newCell;
         head.setType(CellType.SNAKE);
+        parts.addFirst(head);
     }
 
-    public void grow() {
-        parts.add(parts.getLast());
-    }
-
-    public void clear() {
+    public void destroy() {
         for (Cell c : parts) {
             c.setType(CellType.FREE);
         }
     }
 
-    public boolean checkCollision(Cell cell) {
+    public boolean contains(Cell cell) {
         for (Cell c : parts) {
             if (cell == c) return true;
         }

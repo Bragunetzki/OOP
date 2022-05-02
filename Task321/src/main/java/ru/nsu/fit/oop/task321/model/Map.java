@@ -37,26 +37,20 @@ public class Map {
         return height;
     }
 
-    public Cell getCell(int x, int y, Direction direction) {
-        if (x < 0 || y < 0 || x >= width || y >= height)
-            throw new InvalidParameterException("Coordinates out of map bounds!");
-        int newX = x, newY = y;
+    public Cell getCell(Cell cell, Direction direction) {
+        int newX = cell.getX(), newY = cell.getY();
         switch (direction) {
             case TOP -> {
-                newX = x;
-                newY = y + 1;
+                newY -= 1;
             }
             case LEFT -> {
-                newX = x - 1;
-                newY = y;
+                newX -= 1;
             }
             case RIGHT -> {
-                newX = x + 1;
-                newY = y;
+                newX += 1;
             }
             case BOTTOM -> {
-                newX = x;
-                newY = y - 1;
+                newY += 1;
             }
         }
 
@@ -65,6 +59,6 @@ public class Map {
         if (newY < 0) newY = height-1;
         if (newY >= height) newY = 0;
 
-        return mapCells[y][x];
+        return mapCells[newY][newX];
     }
 }

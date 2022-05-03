@@ -3,27 +3,28 @@ package ru.nsu.fit.oop.task321;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import ru.nsu.fit.oop.task321.controller.PlayerController;
 import ru.nsu.fit.oop.task321.model.GameModel;
-import ru.nsu.fit.oop.task321.view.Drawer;
 
 
+/**
+ * The main application class of the program.
+ */
 public class SnakeApplication extends Application {
     private final static int WIDTH = 500;
     private final static int HEIGHT = 500;
     private PlayerController controller;
     private GameModel model;
-    private Drawer drawer;
+    private Game game;
+    private Thread gameThread;
 
     @Override
     public void start(Stage stage) {
         model = new GameModel();
-        controller = new PlayerController();
+        controller = new PlayerController(this);
         controller.subscribe(model.getSnake(0));
-        drawer = new Drawer();
 
         StackPane pane = new StackPane();
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
@@ -39,10 +40,22 @@ public class SnakeApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        Game game = new Game(model, new Drawer(), controller, canvas.getGraphicsContext2D());
+        game = new Game(model, controller, canvas.getGraphicsContext2D());
+        gameThread = new Thread(game);
+        gameThread.start();
+    }
 
-        Thread gameLoop = new Thread(game);
-        gameLoop.start();
+    /**
+     * Resets the game application.
+     */
+    public void reset() {
+        if (!game.isRunning()) {
+            model.reset();
+            controller.reset();
+            controller.subscribe(model.getSnake(0));
+            gameThread = new Thread(game);
+            gameThread.start();
+        }
     }
 
     public static void main(String[] args) {

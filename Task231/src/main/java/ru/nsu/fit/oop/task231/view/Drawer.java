@@ -2,6 +2,7 @@ package ru.nsu.fit.oop.task231.view;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import ru.nsu.fit.oop.task231.model.Cell;
 import ru.nsu.fit.oop.task231.model.GameModel;
 import ru.nsu.fit.oop.task231.model.Map;
@@ -57,6 +58,7 @@ public abstract class Drawer {
      */
     public static void drawMessage(String message, GraphicsContext gc) {
         gc.setFill(Color.WHITE);
+        gc.setFont(Font.font("Arial"));
         gc.fillText(message, 30, 30);
     }
 }

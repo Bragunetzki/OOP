@@ -1,5 +1,6 @@
 package ru.nsu.fit.oop.task231.controller;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import ru.nsu.fit.oop.task231.model.GameModel;
 import ru.nsu.fit.oop.task231.view.Drawer;
@@ -8,8 +9,8 @@ import ru.nsu.fit.oop.task231.view.Drawer;
  * The class that runs the main game loop.
  */
 public class Game implements Runnable {
-    private static final float gameSpeed = 5;
-    private static final float updateInterval = 1000.0f / gameSpeed;
+    private static final float gameSpeed = 8;
+    private static final float updateInterval = 1e+9f / gameSpeed;
     private final GameModel model;
     private final PlayerController controller;
     private final GraphicsContext gc;
@@ -45,31 +46,27 @@ public class Game implements Runnable {
      */
     @Override
     public void run() {
-        running = true;
+        AnimationTimer timer = new AnimationTimer() {
+            private long lastFrame = 0;
 
-        while (running) {
-            float delta = System.currentTimeMillis();
+            @Override
+            public void handle(long now) {
+                if (now - lastFrame >= updateInterval) {
+                    model.update();
+                    Drawer.draw(model, gc);
+                    controller.resetKeyPressed();
 
-            model.update();
-            Drawer.draw(model, gc);
-            controller.resetKeyPressed();
-
-            if (model.isGameOver()) {
-                running = false;
-                controller.resetKeyPressed();
-                Drawer.drawMessage("Game Over! Press ENTER to restart.", gc);
-                break;
-            }
-
-            delta = System.currentTimeMillis() - delta;
-
-            if (delta < updateInterval) {
-                try {
-                    Thread.sleep((long) (updateInterval - delta));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    if (model.isGameOver()) {
+                        controller.resetKeyPressed();
+                        Drawer.drawMessage("Game Over! Press ENTER to restart.", gc);
+                        running = false;
+                        stop();
+                    }
+                    lastFrame = now;
                 }
             }
-        }
+        };
+        running = true;
+        timer.start();
     }
 }

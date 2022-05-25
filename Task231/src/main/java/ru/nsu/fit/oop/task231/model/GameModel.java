@@ -74,7 +74,7 @@ public class GameModel {
         boolean collides = false;
 
         for (Snake s : snakes) {
-            if (s.contains(map.getCell(x, y)) || map.getCell(x, y).getType() == CellType.OBSTACLE || map.getCell(x, y).getType() == CellType.FOOD) {
+            if (s.contains(map.getCell(x, y))) {
                 collides = true;
                 break;
             }

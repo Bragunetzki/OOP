@@ -1,6 +1,7 @@
 package ru.nsu.fit.oop.task231.model;
 
 import java.security.InvalidParameterException;
+import java.util.Random;
 
 /**
  * A map with a set width and height consisting of Cells.
@@ -9,6 +10,7 @@ public class Map {
     private final int width;
     private final int height;
     private final Cell[][] mapCells;
+    private final static int OBSTACLE_DENSITY = 3;
 
     /**
      * Creates a Map with a set size.
@@ -28,20 +30,32 @@ public class Map {
      * Clears all map cells.
      */
     public void reset() {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                mapCells[y][x] = new Cell(x, y, CellType.FREE);
-            }
-        }
+        initCells();
+    }
+
+    public Cell getRandomFreeCell() {
+        int x = (int) (Math.random() * width);
+        int y = (int) (Math.random() * height);
+        boolean collides = getCell(x, y).getType() == CellType.OBSTACLE
+                || getCell(x, y).getType() == CellType.FOOD
+                || getCell(x, y).getType() == CellType.SNAKE;
+
+        if (collides) return getRandomFreeCell();
+        else return getCell(x, y);
     }
 
     /**
      * Initializes all map cells. Called in constructor.
      */
     private void initCells() {
+        Random rand = new Random();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                mapCells[y][x] = new Cell(x, y, CellType.FREE);
+                if (rand.nextInt(101) < OBSTACLE_DENSITY) {
+                    mapCells[y][x] = new Cell(x, y, CellType.OBSTACLE);
+                } else {
+                    mapCells[y][x] = new Cell(x, y, CellType.FREE);
+                }
             }
         }
     }

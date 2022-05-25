@@ -20,7 +20,7 @@ public class GameModel {
         map = new Map(MAP_WIDTH, MAP_HEIGHT);
         snakes = new ArrayList<>();
         snakesForRemoval = new ArrayList<>();
-        snakes.add(new Snake(this, map.getCell(10, 10)));
+        snakes.add(new Snake(this, map.getRandomFreeCell()));
         generateFood();
     }
 
